@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: controle-horas
+              uri: http://localhost:8082/
+              predicates:
+                - Path=/registros/**
+
