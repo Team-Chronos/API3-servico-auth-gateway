@@ -8,7 +8,44 @@ spring:
         webflux:
           routes:
             - id: controle-horas
-              uri: http://localhost:8082/
+              uri: http://controle-horas:8082/
               predicates:
-                - Path=/registros/**
+                - Path=/apontamento/**
+              filters:
+                - StripPrefix=1
+
+            - id: ms-profissionais
+              uri: http://ms-profissionais:8081/
+              predicates:
+                - Path=/profissionais/**
+              filters:
+                - StripPrefix=1
+
+            - id: projeto
+              uri: http://projeto:8084/
+              predicates:
+                - Path=/projeto/**
+              filters:
+                - StripPrefix=1
+
+            - id: financeiro
+              uri: http://financeiro:8085/
+              predicates:
+                - Path=/financeiro/**
+              filters:
+                - StripPrefix=1
+
+            - id: tarefas-api
+              uri: http://tarefas-api:8089/
+              predicates:
+                - Path=/tarefas/**
+              filters:
+                - StripPrefix=1
+
+            - id: login-api
+              uri: http://login-api:8083/
+              predicates:
+                - Path=/login/**
+              filters:
+                - StripPrefix=1
 
