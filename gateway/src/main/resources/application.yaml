@@ -1,51 +1,121 @@
 spring:
   application:
-    name: gateway
-
+    name: auth-gateway
+  data:
+    redis:
+      host: redis
+      port: 6379
+      timeout: 2s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            - id: controle-horas
-              uri: http://controle-horas:8082/
-              predicates:
-                - Path=/apontamento/**
-              filters:
-                - StripPrefix=1
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders:
+              - Authorization
+              - Content-Type
+              - X-Requested-With
+              - Accept
+              - Origin
+              - Access-Control-Request-Method
+              - Access-Control-Request-Headers
+            exposedHeaders:
+              - Authorization
+              - X-User-Id
+              - X-Username
+              - X-User-Roles
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        - id: controle-horas
+          uri: http://controle-horas:8082
+          predicates:
+            - Path=/apontamento/**
+          filters:
+            - StripPrefix=1
+        - id: ms-profissionais
+          uri: http://ms-profissionais:8081
+          predicates:
+            - Path=/profissionais/**
+          filters:
+            - StripPrefix=1
+        - id: projeto
+          uri: http://projeto:8084
+          predicates:
+            - Path=/projeto/**
+          filters:
+            - StripPrefix=1
+        - id: financeiro
+          uri: http://financeiro:8085
+          predicates:
+            - Path=/financeiro/**
+          filters:
+            - StripPrefix=1
+        - id: tarefas-api
+          uri: http://tarefas-api:8089
+          predicates:
+            - Path=/tarefas/**
+          filters:
+            - StripPrefix=1
+        - id: login-api
+          uri: http://login-api:8083
+          predicates:
+            - Path=/login/**
+         # filters:
+            #- StripPrefix=1
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 10s
 
-            - id: ms-profissionais
-              uri: http://ms-profissionais:8081/
-              predicates:
-                - Path=/profissionais/**
-              filters:
-                - StripPrefix=1
+jwt:
+  secret: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
+  expiration: 3600000
 
-            - id: projeto
-              uri: http://projeto:8084/
-              predicates:
-                - Path=/projeto/**
-              filters:
-                - StripPrefix=1
+auth:
+  public-paths:
+    - /login/**
+    - /login
+    - /auth/**
+    - /public/**
+    - /actuator/health
+  rate-limits:
+    per-token: 100
+    per-ip: 200
+  rules:
+    - path: /financeiro/**
+      methods: [GET, POST, PUT, DELETE, PATCH]
+      roles: [ROLE_ADMIN, ROLE_FINANCE]
+    - path: /**
+      methods: [DELETE]
+      roles: [ROLE_ADMIN]
+    - path: /admin/**
+      roles: [ROLE_ADMIN]
 
-            - id: financeiro
-              uri: http://financeiro:8085/
-              predicates:
-                - Path=/financeiro/**
-              filters:
-                - StripPrefix=1
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
 
-            - id: tarefas-api
-              uri: http://tarefas-api:8089/
-              predicates:
-                - Path=/tarefas/**
-              filters:
-                - StripPrefix=1
-
-            - id: login-api
-              uri: http://login-api:8083/
-              predicates:
-                - Path=/login/**
-              filters:
-                - StripPrefix=1
-
+logging:
+  level:
+    com.api.gateway: DEBUG
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web: DEBUG
