@@ -20,9 +20,11 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private final TokenValidator tokenValidator;
+    private final AuthorizationProperties authProperties; 
 
-    public JwtAuthenticationFilter(TokenValidator tokenValidator) {
+    public JwtAuthenticationFilter(TokenValidator tokenValidator, AuthorizationProperties authProperties) {
         this.tokenValidator = tokenValidator;
+        this.authProperties = authProperties;
     }
 
     @Override
@@ -32,6 +34,10 @@ public class JwtAuthenticationFilter implements GlobalFilter {
         String method = request.getMethod().name();
 
         if ("OPTIONS".equalsIgnoreCase(method)) {
+            return chain.filter(exchange);
+        }
+
+        if (isPublicPath(path)) {
             return chain.filter(exchange);
         }
 
@@ -53,6 +59,10 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                     ServerHttpRequest mutatedRequest = propagateUserInfo(request, result);
                     return chain.filter(exchange.mutate().request(mutatedRequest).build());
                 });
+    }
+
+    private boolean isPublicPath(String path) {
+        return authProperties.getPublicPaths().stream().anyMatch(path::startsWith);
     }
 
     private String getClientIp(ServerHttpRequest request) {
