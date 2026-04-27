@@ -81,7 +81,7 @@ spring:
 
 jwt:
   secret: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
-  expiration: 3600000
+  expiration: 86400000   # 24 horas
 
 auth:
   public-paths:
@@ -96,22 +96,31 @@ auth:
   rules:
     - path: /financeiro/**
       methods: [GET, POST, PUT, DELETE, PATCH]
-      roles: [ROLE_ADMIN, ROLE_FINANCE]
+      roles: [ROLE_FINANCE]
 
     - path: /projeto/**
-      methods: [GET, POST, PUT]
-      roles: [ROLE_ADMIN, ROLE_GERENTE_PROJETO]
+      methods: [GET, POST, PUT, DELETE, PATCH]
+      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+
+    - path: /profissionais/**
+      methods: [GET]
+      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+
+    - path: /profissionais/**
+      methods: [POST, PUT, DELETE, PATCH]
+      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO]
 
     - path: /tarefas/**
-      methods: [GET, POST, PUT]
-      roles: [ROLE_ADMIN, ROLE_GERENTE_PROJETO]
+      methods: [GET, POST, PUT, DELETE, PATCH]
+      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+
+    - path: /apontamento/**
+      methods: [GET, POST, PUT, DELETE, PATCH]
+      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
 
     - path: /**
-      methods: [DELETE]
-      roles: [ROLE_ADMIN]
-
-    - path: /admin/**
-      roles: [ROLE_ADMIN]
+      methods: [GET, POST, PUT, DELETE, PATCH]
+      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
 
 management:
   endpoints:
