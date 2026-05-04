@@ -3,8 +3,8 @@ spring:
     name: auth-gateway
   data:
     redis:
-      host: redis
-      port: 6379
+      host: ${SPRING_DATA_REDIS_HOST:redis}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
       timeout: 2s
       lettuce:
         pool:
@@ -47,41 +47,58 @@ spring:
             - Path=/apontamento/**
           filters:
             - StripPrefix=1
+
         - id: ms-profissionais
           uri: http://ms-profissionais:8081
           predicates:
             - Path=/profissionais/**
           filters:
             - StripPrefix=1
+
         - id: projeto
           uri: http://projeto:8084
           predicates:
             - Path=/projeto/**
           filters:
             - StripPrefix=1
+
         - id: financeiro
           uri: http://financeiro:8085
           predicates:
             - Path=/financeiro/**
           filters:
             - StripPrefix=1
+
         - id: tarefas-api
           uri: http://tarefas-api:8089
           predicates:
             - Path=/tarefas/**
           filters:
             - StripPrefix=1
+
+        - id: tipo-tarefa-api
+          uri: http://tarefas-api:8089
+          predicates:
+            - Path=/tipoTarefa/**
+
+        - id: itens-api
+          uri: http://tarefas-api:8089
+          predicates:
+            - Path=/itens/**
+
         - id: login-api
           uri: http://login-api:8083
           predicates:
             - Path=/login/**
+          filters:
+            - StripPrefix=1
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
 
 jwt:
   secret: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
-  expiration: 86400000   # 24 horas
+  expiration: 86400000
 
 auth:
   public-paths:
@@ -114,11 +131,15 @@ auth:
       methods: [GET, POST, PUT, DELETE, PATCH]
       roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
 
-    - path: /apontamento/**
+    - path: /tipoTarefa/**
       methods: [GET, POST, PUT, DELETE, PATCH]
       roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
 
-    - path: /**
+    - path: /itens/**
+      methods: [GET, POST, PUT, DELETE, PATCH]
+      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+
+    - path: /apontamento/**
       methods: [GET, POST, PUT, DELETE, PATCH]
       roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
 
