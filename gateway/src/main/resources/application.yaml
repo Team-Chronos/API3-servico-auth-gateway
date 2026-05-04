@@ -90,8 +90,7 @@ spring:
           uri: http://login-api:8083
           predicates:
             - Path=/login/**
-          filters:
-            - StripPrefix=1
+            
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
