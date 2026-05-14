@@ -73,6 +73,7 @@ spring:
           uri: http://tarefas-api:8089
           predicates:
             - Path=/tarefas/**
+            - Method=POST,PUT,DELETE,PATCH
           filters:
             - StripPrefix=1
 
@@ -80,11 +81,33 @@ spring:
           uri: http://tarefas-api:8089
           predicates:
             - Path=/tipoTarefa/**
+            - Method=POST,PUT,DELETE,PATCH
 
         - id: itens-api
           uri: http://tarefas-api:8089
           predicates:
             - Path=/itens/**
+            - Method=POST,PUT,DELETE,PATCH
+
+        - id: tarefas-get-api
+          uri: http://tarefas-get-api:8099
+          predicates:
+            - Path=/tarefas/**
+            - Method=GET
+          filters:
+            - StripPrefix=1
+
+        - id: tipo-tarefa-get-api
+          uri: http://tarefas-get-api:8099
+          predicates:
+            - Path=/tipoTarefa/**
+            - Method=GET
+
+        - id: itens-get-api
+          uri: http://tarefas-get-api:8099
+          predicates:
+            - Path=/itens/**
+            - Method=GET
 
         - id: login-api
           uri: http://login-api:8083
