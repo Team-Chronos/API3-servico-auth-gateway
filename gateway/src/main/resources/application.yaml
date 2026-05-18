@@ -1,4 +1,4 @@
-spring:
+  spring:
   application:
     name: auth-gateway
   data:
@@ -45,6 +45,7 @@ spring:
           uri: http://controle-horas:8082
           predicates:
             - Path=/apontamento/**
+            - Method=POST,PUT,DELETE,PATCH
           filters:
             - StripPrefix=1
 
@@ -107,6 +108,12 @@ spring:
           uri: http://tarefas-get-api:8099
           predicates:
             - Path=/itens/**
+            - Method=GET
+
+        - id: apontamento-get-api
+          uri: http://apontamento-get-api:8092
+          predicates:
+            - Path=/apontamento/**
             - Method=GET
 
         - id: login-api
