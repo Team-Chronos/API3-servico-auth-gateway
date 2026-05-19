@@ -15,7 +15,7 @@
     gateway:
       globalcors:
         cors-configurations:
-          '[/**]':
+          "[/**]":
             allowedOrigins:
               - "http://localhost:5173"
             allowedMethods:
@@ -36,7 +36,7 @@
             exposedHeaders:
               - Authorization
               - X-User-Id
-              - X-Username
+              - x-username
               - X-User-Roles
             allowCredentials: true
             maxAge: 3600
@@ -127,7 +127,7 @@
 
 jwt:
   secret: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
-  expiration: 86400000
+  expiration: 86400000 # 24 horas
 
 auth:
   public-paths:
