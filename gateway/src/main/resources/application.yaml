@@ -4,7 +4,7 @@ spring:
 
   data:
     redis:
-      host: ${SPRING_DATA_REDIS_HOST:redis}
+      host: ${SPRING_DATA_REDIS_HOST:redis-cache}
       port: ${SPRING_DATA_REDIS_PORT:6379}
       timeout: 2s
       lettuce:
@@ -52,6 +52,14 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: apontamento-get-api
+          uri: http://controle-visualizar-horas:8092
+          predicates:
+            - Path=/apontamento/**
+            - Method=GET
+          filters:
+            - StripPrefix=1
+
         - id: ms-profissionais
           uri: http://ms-profissionais:8081
           predicates:
@@ -86,12 +94,16 @@ spring:
           predicates:
             - Path=/tipoTarefa/**
             - Method=POST,PUT,DELETE,PATCH
+          filters:
+            - StripPrefix=1
 
         - id: itens-api
           uri: http://tarefas-api:8089
           predicates:
             - Path=/itens/**
             - Method=POST,PUT,DELETE,PATCH
+          filters:
+            - StripPrefix=1
 
         - id: tarefas-get-api
           uri: http://tarefas-get-api:8099
@@ -106,39 +118,44 @@ spring:
           predicates:
             - Path=/tipoTarefa/**
             - Method=GET
+          filters:
+            - StripPrefix=1
 
         - id: itens-get-api
           uri: http://tarefas-get-api:8099
           predicates:
             - Path=/itens/**
             - Method=GET
-
-        - id: apontamento-get-api
-          uri: http://apontamento-get-api:8092
-          predicates:
-            - Path=/apontamento/**
-            - Method=GET
+          filters:
+            - StripPrefix=1
 
         - id: login-api
           uri: http://login-api:8083
           predicates:
-            - Path=/login/**
+            - Path=/login
+            - Method=POST
+
+        - id: login-health
+          uri: http://login-api:8083
+          predicates:
+            - Path=/health
+            - Method=GET
 
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
 
 jwt:
-  secret: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
-  expiration: 86400000 # 24 horas
+  secret: "rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sygDZzvL9Xk3OPn4fp3CZcufV75"
+  expiration: 86400000
 
 auth:
   public-paths:
-    - /login/**
     - /login
     - /auth/**
     - /public/**
     - /actuator/health
+    - /health
 
   rate-limits:
     per-token: 100
