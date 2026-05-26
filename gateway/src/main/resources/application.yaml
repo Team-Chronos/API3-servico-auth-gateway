@@ -1,16 +1,18 @@
 spring:
   application:
     name: auth-gateway
+
   data:
     redis:
-      host: redis
-      port: 6379
+      host: ${SPRING_DATA_REDIS_HOST:redis-cache}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
       timeout: 2s
       lettuce:
         pool:
           max-active: 8
           max-idle: 8
           min-idle: 0
+
   cloud:
     gateway:
       globalcors:
@@ -40,93 +42,233 @@ spring:
               - X-User-Roles
             allowCredentials: true
             maxAge: 3600
+
       routes:
         - id: controle-horas
           uri: http://controle-horas:8082
           predicates:
             - Path=/apontamento/**
+            - Method=POST,PUT,DELETE,PATCH
           filters:
             - StripPrefix=1
+
+        - id: apontamento-get-api
+          uri: http://controle-visualizar-horas:8092
+          predicates:
+            - Path=/apontamento/**
+            - Method=GET
+          filters:
+            - StripPrefix=1
+
         - id: ms-profissionais
           uri: http://ms-profissionais:8081
           predicates:
             - Path=/profissionais/**
           filters:
             - StripPrefix=1
+
         - id: projeto
           uri: http://projeto:8084
           predicates:
             - Path=/projeto/**
           filters:
             - StripPrefix=1
+
         - id: financeiro
           uri: http://financeiro:8085
           predicates:
             - Path=/financeiro/**
           filters:
             - StripPrefix=1
+
         - id: tarefas-api
           uri: http://tarefas-api:8089
           predicates:
             - Path=/tarefas/**
+            - Method=POST,PUT,DELETE,PATCH
           filters:
             - StripPrefix=1
+
+        - id: tipo-tarefa-api
+          uri: http://tarefas-api:8089
+          predicates:
+            - Path=/tipoTarefa/**
+            - Method=POST,PUT,DELETE,PATCH
+          filters:
+            - StripPrefix=1
+
+        - id: itens-api
+          uri: http://tarefas-api:8089
+          predicates:
+            - Path=/itens/**
+            - Method=POST,PUT,DELETE,PATCH
+          filters:
+            - StripPrefix=1
+
+        - id: tarefas-get-api
+          uri: http://tarefas-get-api:8099
+          predicates:
+            - Path=/tarefas/**
+            - Method=GET
+          filters:
+            - StripPrefix=1
+
+        - id: tipo-tarefa-get-api
+          uri: http://tarefas-get-api:8099
+          predicates:
+            - Path=/tipoTarefa/**
+            - Method=GET
+          filters:
+            - StripPrefix=1
+
+        - id: itens-get-api
+          uri: http://tarefas-get-api:8099
+          predicates:
+            - Path=/itens/**
+            - Method=GET
+          filters:
+            - StripPrefix=1
+
         - id: login-api
           uri: http://login-api:8083
           predicates:
-            - Path=/login/**
+            - Path=/login
+            - Method=POST
+
+        - id: login-health
+          uri: http://login-api:8083
+          predicates:
+            - Path=/health
+            - Method=GET
+
+        - id: auditoria-api
+          uri: http://auditoria-api:8090
+          predicates:
+            - Path=/auditoria/**
+          filters:
+            - StripPrefix=1
+
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
 
 jwt:
-  secret: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
-  expiration: 86400000 # 24 horas
+  secret: "rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sygDZzvL9Xk3OPn4fp3CZcufV75"
+  expiration: 86400000
 
 auth:
   public-paths:
-    - /login/**
     - /login
     - /auth/**
     - /public/**
     - /actuator/health
+    - /health
+
   rate-limits:
     per-token: 100
     per-ip: 200
+
   rules:
     - path: /financeiro/**
-      methods: [GET, POST, PUT, DELETE, PATCH]
-      roles: [ROLE_FINANCE]
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+      roles:
+        - ROLE_FINANCE
 
     - path: /projeto/**
-      methods: [GET, POST, PUT, DELETE, PATCH]
-      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+      roles:
+        - ROLE_FINANCE
+        - ROLE_GERENTE_PROJETO
+        - ROLE_USER
 
     - path: /profissionais/**
-      methods: [GET]
-      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+      methods:
+        - GET
+      roles:
+        - ROLE_FINANCE
+        - ROLE_GERENTE_PROJETO
+        - ROLE_USER
 
     - path: /profissionais/**
-      methods: [POST, PUT, DELETE, PATCH]
-      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO]
+      methods:
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+      roles:
+        - ROLE_FINANCE
+        - ROLE_GERENTE_PROJETO
 
     - path: /tarefas/**
-      methods: [GET, POST, PUT, DELETE, PATCH]
-      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+      roles:
+        - ROLE_FINANCE
+        - ROLE_GERENTE_PROJETO
+        - ROLE_USER
+
+    - path: /tipoTarefa/**
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+      roles:
+        - ROLE_FINANCE
+        - ROLE_GERENTE_PROJETO
+        - ROLE_USER
+
+    - path: /itens/**
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+      roles:
+        - ROLE_FINANCE
+        - ROLE_GERENTE_PROJETO
+        - ROLE_USER
+
+    - path: /auditoria/**
+      methods:
+        - GET
+      roles:
+        - ROLE_GERENTE_PROJETO
 
     - path: /apontamento/**
-      methods: [GET, POST, PUT, DELETE, PATCH]
-      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
-
-    - path: /**
-      methods: [GET, POST, PUT, DELETE, PATCH]
-      roles: [ROLE_FINANCE, ROLE_GERENTE_PROJETO, ROLE_USER]
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+      roles:
+        - ROLE_FINANCE
+        - ROLE_GERENTE_PROJETO
+        - ROLE_USER
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
   endpoint:
     health:
       show-details: always
