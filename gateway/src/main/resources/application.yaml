@@ -94,8 +94,6 @@ spring:
           predicates:
             - Path=/tipoTarefa/**
             - Method=POST,PUT,DELETE,PATCH
-          filters:
-            - StripPrefix=1
 
         - id: itens-api
           uri: http://tarefas-api:8089
@@ -118,8 +116,6 @@ spring:
           predicates:
             - Path=/tipoTarefa/**
             - Method=GET
-          filters:
-            - StripPrefix=1
 
         - id: itens-get-api
           uri: http://tarefas-get-api:8099
