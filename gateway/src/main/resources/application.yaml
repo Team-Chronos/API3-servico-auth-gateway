@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: auth-gateway
@@ -94,6 +95,7 @@ spring:
           predicates:
             - Path=/tipoTarefa/**
             - Method=POST,PUT,DELETE,PATCH
+            
 
         - id: itens-api
           uri: http://tarefas-api:8089
@@ -116,6 +118,7 @@ spring:
           predicates:
             - Path=/tipoTarefa/**
             - Method=GET
+           
 
         - id: itens-get-api
           uri: http://tarefas-get-api:8099
@@ -136,6 +139,13 @@ spring:
           predicates:
             - Path=/health
             - Method=GET
+
+        - id: auditoria-api
+          uri: http://auditoria-api:8090
+          predicates:
+            - Path=/auditoria/**
+          filters:
+            - StripPrefix=1
 
       httpclient:
         connect-timeout: 2000
@@ -233,6 +243,12 @@ auth:
         - ROLE_FINANCE
         - ROLE_GERENTE_PROJETO
         - ROLE_USER
+
+    - path: /auditoria/**
+      methods:
+        - GET
+      roles:
+        - ROLE_GERENTE_PROJETO
 
     - path: /apontamento/**
       methods:
