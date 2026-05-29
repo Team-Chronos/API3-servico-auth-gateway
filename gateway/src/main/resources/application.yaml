@@ -54,7 +54,7 @@ spring:
             - StripPrefix=1
 
         - id: apontamento-get-api
-          uri: http://controle-visualizar-horas:8092
+          uri: http://controle-horas:8082
           predicates:
             - Path=/apontamento/**
             - Method=GET
